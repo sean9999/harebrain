@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Harebrain",
+			"path": "."
+		},
+		{
+			"name": "RealFS",
+			"path": "../go-real-fs"
+		}
+	],
+	"settings": {}
+}
