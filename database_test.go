@@ -47,8 +47,8 @@ func TestDatabase_LoadTables(t *testing.T) {
 	assert.Nil(t, err)
 	noRecords := map[string]EncodeHasher{}
 	want := map[string]*Table{
-		"cats": &Table{Folder: "cats", Db: db, Records: noRecords},
-		"dogs": &Table{Folder: "dogs", Db: db, Records: noRecords},
+		"cats": {Folder: "cats", Db: db, Records: noRecords},
+		"dogs": {Folder: "dogs", Db: db, Records: noRecords},
 	}
 	assert.ElementsMatch(t, tbls, want, "wanted cats and dogs")
 }

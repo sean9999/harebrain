@@ -9,6 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// *dog implements EncoderHasher
+var _ EncodeHasher = (*dog)(nil)
+
 type dog struct {
 	Id   int    `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
