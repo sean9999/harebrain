@@ -6,25 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// type jsonCodec struct {
-// 	poly uint64
-// }
-
-// func (jc jsonCodec) Serialize(rec EncodeHasher) []byte {
-// 	j, _ := json.Marshal(rec)
-// 	return j
-// }
-// func (jc jsonCodec) Deserialize(p []byte) *EncodeHasher {
-// 	rec := new(EncodeHasher)
-// 	json.Unmarshal(p, rec)
-// 	return rec
-// }
-// func (jc jsonCodec) Hash(rec EncodeHasher) string {
-// 	b := rec.Serialize()
-// 	chk := crc64.Checksum(b, crc64.MakeTable(jc.poly))
-// 	return fmt.Sprintf("%x.json", chk)
-// }
-
 func TestDatabase_Open(t *testing.T) {
 
 	t.Run("folder that exists", func(t *testing.T) {
@@ -40,15 +21,11 @@ func TestDatabase_Open(t *testing.T) {
 
 }
 
-func TestDatabase_LoadTables(t *testing.T) {
-	db := new(Database)
-	db.Open("data")
-	tbls, err := db.LoadTables()
-	assert.Nil(t, err)
-	noRecords := map[string]EncodeHasher{}
-	want := map[string]*Table{
-		"cats": {Folder: "cats", Db: db, Records: noRecords},
-		"dogs": {Folder: "dogs", Db: db, Records: noRecords},
-	}
-	assert.ElementsMatch(t, tbls, want, "wanted cats and dogs")
-}
+// func TestDatabase_LoadTables(t *testing.T) {
+// 	db := new(Database)
+// 	db.Open("data")
+// 	tbls, err := db.LoadTables()
+// 	assert.Nil(t, err)
+// 	assert.Contains(t, tbls, "cats")
+// 	assert.Contains(t, tbls, "dogs")
+// }

@@ -1,14 +1,12 @@
 package harebrain
 
 import (
-	"fmt"
 	"path/filepath"
 )
 
 type Table struct {
-	Folder  string
-	Db      *Database
-	Records map[string]EncodeHasher
+	Folder string
+	Db     *Database
 }
 
 func (t *Table) Path() string {
@@ -25,52 +23,50 @@ func (t *Table) Insert(rec EncodeHasher) error {
 	if err != nil {
 		return err
 	}
-	t.Records[rec.Hash()] = rec
 	return nil
 }
 
-func (t *Table) Get(f string) (EncodeHasher, error) {
-	var rec EncodeHasher
+func (t *Table) Load(f string, rec EncodeHasher) error {
 	fullPath := filepath.Join(t.Path(), f)
 	p, err := t.Db.Filesystem.ReadFile(fullPath)
 	if err != nil {
-		return rec, err
+		return err
 	}
-	err = rec.UnmarshalBinary(p)
-	return rec, err
+	return rec.UnmarshalBinary(p)
 }
 
 func (t *Table) Delete(f string) error {
-	return t.Db.Filesystem.Remove(f)
+	fullPath := filepath.Join(t.Path(), f)
+	return t.Db.Filesystem.Remove(fullPath)
 }
 
-func (t *Table) LoadRecords() (map[string]EncodeHasher, []error) {
-	records := map[string]EncodeHasher{}
-	errs := []error{}
-	entries, err := t.Db.Filesystem.ReadDir(t.Path())
-	if err != nil {
-		return nil, []error{err}
-	}
-	for _, entry := range entries {
-		if entry.Type().IsRegular() {
-			p, err := t.Db.Filesystem.ReadFile(entry.Name())
-			if err == nil {
-				var rec EncodeHasher
-				err := rec.UnmarshalBinary(p)
-				if err != nil {
-					errs = append(errs, err)
-					continue
-				}
-				hash := rec.Hash()
-				if hash != entry.Name() {
-					errs = append(errs, fmt.Errorf("hash %q doesn't match filename %q", hash, entry.Name()))
-				} else {
-					records[hash] = rec
-				}
-			} else {
-				errs = append(errs, err)
-			}
-		}
-	}
-	return records, errs
-}
+// func (t *Table) LoadRecords(obj EncodeHasher) []error {
+// 	records := map[string]EncodeHasher{}
+// 	errs := []error{}
+// 	entries, err := t.Db.Filesystem.ReadDir(t.Path())
+// 	if err != nil {
+// 		return nil, []error{err}
+// 	}
+// 	for _, entry := range entries {
+// 		if entry.Type().IsRegular() {
+// 			p, err := t.Db.Filesystem.ReadFile(filepath.Join(t.Path(), entry.Name()))
+// 			if err == nil {
+
+// 				err := rec.UnmarshalBinary(p)
+// 				if err != nil {
+// 					errs = append(errs, err)
+// 					continue
+// 				}
+// 				hash := rec.Hash()
+// 				if hash != entry.Name() {
+// 					errs = append(errs, fmt.Errorf("hash %q doesn't match filename %q", hash, entry.Name()))
+// 				} else {
+// 					records[hash] = rec
+// 				}
+// 			} else {
+// 				errs = append(errs, err)
+// 			}
+// 		}
+// 	}
+// 	return records, errs
+// }

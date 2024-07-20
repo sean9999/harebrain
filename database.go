@@ -9,13 +9,11 @@ import (
 
 type Database struct {
 	Folder     string
-	Tables     map[string]*Table
 	Filesystem realfs.WritableFs
 }
 
 func NewDatabase() *Database {
 	db := Database{
-		Tables:     map[string]*Table{},
 		Filesystem: realfs.NewWritable(),
 	}
 	return &db
@@ -34,20 +32,28 @@ func (db *Database) Open(folder string) error {
 }
 
 func (db *Database) Table(name string) *Table {
-	return db.Tables[name]
+	tbl := &Table{Db: db, Folder: name}
+	// info, err := os.Stat(tbl.Path())
+	// if err != nil {
+	// 	return nil
+	// }
+	// if !info.IsDir() {
+	// 	return nil
+	// }
+	return tbl
 }
 
-func (db *Database) LoadTables() (map[string]*Table, error) {
-	entries, err := os.ReadDir(db.Folder)
-	if err != nil {
-		return nil, err
-	}
-	tables := make(map[string]*Table, len(entries))
-	for _, entry := range entries {
-		if entry.IsDir() {
-			tables[entry.Name()] = &Table{entry.Name(), db, map[string]EncodeHasher{}}
-		}
-	}
-	db.Tables = tables
-	return tables, nil
-}
+// func (db *Database) LoadTables() (map[string]*Table, error) {
+// 	entries, err := os.ReadDir(db.Folder)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	tables := make(map[string]*Table)
+// 	for _, entry := range entries {
+// 		if entry.IsDir() {
+// 			tables[entry.Name()] = &Table{entry.Name(), db, map[string]EncodeHasher{}}
+// 		}
+// 	}
+// 	db.Tables = tables
+// 	return tables, nil
+// }
