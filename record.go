@@ -7,24 +7,11 @@ import (
 	"hash/crc64"
 )
 
-type Record[T EncodeHasher] struct {
-	Data T
-}
-
-func (r *Record[T]) Hash() string {
-	return r.Data.Hash()
-}
-func (r *Record[T]) MarshalBinary() ([]byte, error) {
-	return r.Data.MarshalBinary()
-}
-func (r *Record[T]) UnmarshalBinary(p []byte) error {
-	return r.Data.UnmarshalBinary(p)
-}
-
 type EncodeHasher interface {
 	Hash() string
 	encoding.BinaryMarshaler
 	encoding.BinaryUnmarshaler
+	Clone() EncodeHasher
 }
 
 type JsonRecord[T any] struct {
@@ -42,14 +29,16 @@ func (j *JsonRecord[T]) MarshalBinary() ([]byte, error) {
 }
 func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
 	var data T
-	return json.Unmarshal(p, data)
+	err := json.Unmarshal(p, data)
+	if err != nil {
+		return err
+	}
+	j.Data = data
+	return nil
 }
-
-// func (j *JsonRecord[T]) Clone() JsonRecord[T] {
-// 	d1Bytes, _ := j.MarshalBinary()
-// 	buf := new(bytes.Buffer)
-
-// 	var d2 T
-
-// 	return JsonRecord[T]{Data: j.Data}
-// }
+func (j *JsonRecord[T]) Clone() EncodeHasher {
+	var j2 = new(JsonRecord[T])
+	jbytes, _ := j.MarshalBinary()
+	j2.UnmarshalBinary(jbytes)
+	return j2
+}

@@ -19,6 +19,14 @@ type dog struct {
 	Says string `json:"says,omitempty"`
 }
 
+type nakedCat struct {
+	Id    int
+	Size  int
+	Breed string
+}
+
+type cat = JsonRecord[nakedCat]
+
 func (j *dog) Hash() string {
 	b, _ := j.MarshalBinary()
 	h := crc32.ChecksumIEEE(b)
@@ -29,6 +37,12 @@ func (j *dog) MarshalBinary() ([]byte, error) {
 }
 func (j *dog) UnmarshalBinary(p []byte) error {
 	return json.Unmarshal(p, j)
+}
+func (j *dog) Clone() EncodeHasher {
+	var j2 = new(dog)
+	jbytes, _ := j.MarshalBinary()
+	j2.UnmarshalBinary(jbytes)
+	return j2
 }
 
 func TestTable_Insert(t *testing.T) {
@@ -54,6 +68,22 @@ func TestTable_Insert(t *testing.T) {
 		assert.Nil(t, err)
 		db.Table("dogs").Insert(dog2)
 		db.Table("dogs").Insert(dog3)
+	})
+
+	t.Run("insert some cats", func(t *testing.T) {
+		db := NewDatabase()
+		err := db.Open("data")
+		assert.Nil(t, err, "error should be nil")
+		millie := &cat{nakedCat{1, 5, "Babydoll"}}
+		oliver := &cat{nakedCat{2, 9, "American House"}}
+		err = db.Table("cats").Insert(millie)
+		assert.Nil(t, err)
+		err = db.Table("cats").Insert(oliver)
+		assert.Nil(t, err)
+
+		err = db.Table("cats").Delete(millie.Hash())
+		assert.Nil(t, err)
+
 	})
 
 	t.Run("a file for fido exists", func(t *testing.T) {
@@ -86,6 +116,23 @@ func TestTable_Insert(t *testing.T) {
 		err = db.Table("dogs").Load("1085bb52.json", &d)
 		assert.Nil(t, err)
 		assert.Equal(t, "Millie", d.Name, "dog's name should be Millie")
+	})
+
+}
+
+func TestTable_LoadAll(t *testing.T) {
+
+	t.Run("table that exists", func(t *testing.T) {
+
+		db := NewDatabase()
+		err := db.Open("data")
+		assert.Nil(t, err)
+		var d dog
+
+		m := db.Table("dogs").LoadAll(&d)
+
+		t.Error(m)
+
 	})
 
 }

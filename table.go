@@ -35,6 +35,22 @@ func (t *Table) Load(f string, rec EncodeHasher) error {
 	return rec.UnmarshalBinary(p)
 }
 
+func (t *Table) LoadAll(rec EncodeHasher) map[string]EncodeHasher {
+	entries, err := t.Db.Filesystem.ReadDir(t.Path())
+	if err != nil {
+		return nil
+	}
+	m := map[string]EncodeHasher{}
+	for _, entry := range entries {
+		if entry.Type().IsRegular() {
+			rc := rec.Clone()
+			err = t.Load(entry.Name(), rc)
+			m[entry.Name()] = rc
+		}
+	}
+	return m
+}
+
 func (t *Table) Delete(f string) error {
 	fullPath := filepath.Join(t.Path(), f)
 	return t.Db.Filesystem.Remove(fullPath)
