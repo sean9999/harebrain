@@ -113,26 +113,11 @@ func TestTable_Insert(t *testing.T) {
 		err := db.Open("data")
 		assert.Nil(t, err)
 		var d dog
-		err = db.Table("dogs").Load("1085bb52.json", &d)
-		assert.Nil(t, err)
+		b, err := db.Table("dogs").Get("1085bb52.json")
+		assert.Nil(t, err, "get record from database")
+		err = d.UnmarshalBinary(b)
+		assert.Nil(t, err, "unmarshalling dog")
 		assert.Equal(t, "Millie", d.Name, "dog's name should be Millie")
-	})
-
-}
-
-func TestTable_LoadAll(t *testing.T) {
-
-	t.Run("table that exists", func(t *testing.T) {
-
-		db := NewDatabase()
-		err := db.Open("data")
-		assert.Nil(t, err)
-		var d dog
-
-		m := db.Table("dogs").LoadAll(&d)
-
-		t.Error(m)
-
 	})
 
 }

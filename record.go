@@ -11,7 +11,6 @@ type EncodeHasher interface {
 	Hash() string
 	encoding.BinaryMarshaler
 	encoding.BinaryUnmarshaler
-	Clone() EncodeHasher
 }
 
 type JsonRecord[T any] struct {
@@ -35,10 +34,4 @@ func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
 	}
 	j.Data = data
 	return nil
-}
-func (j *JsonRecord[T]) Clone() EncodeHasher {
-	var j2 = new(JsonRecord[T])
-	jbytes, _ := j.MarshalBinary()
-	j2.UnmarshalBinary(jbytes)
-	return j2
 }
