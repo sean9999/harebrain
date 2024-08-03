@@ -3,7 +3,7 @@ module github.com/sean9999/harebrain
 go 1.22.2
 
 require (
-	github.com/sean9999/go-real-fs v0.0.2
+	github.com/sean9999/go-real-fs v0.0.4
 	github.com/stretchr/testify v1.9.0
 )
 
