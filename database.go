@@ -7,6 +7,7 @@ import (
 	realfs "github.com/sean9999/go-real-fs"
 )
 
+// a Database is a root folder that acts as a container for [Table]s
 type Database struct {
 	Folder     string
 	Filesystem realfs.WritableFs

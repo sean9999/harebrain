@@ -7,26 +7,33 @@ import (
 	"hash/crc64"
 )
 
+// an EncodeHasher is a record in a table in a harebrain database
 type EncodeHasher interface {
 	Hash() string
 	encoding.BinaryMarshaler
 	encoding.BinaryUnmarshaler
-	Clone() EncodeHasher
 }
 
+var _ EncodeHasher = (*JsonRecord[string])(nil)
+
+// JsonRecord is an EncodeHasher that serializes to JSON
 type JsonRecord[T any] struct {
 	Data T
 }
 
+// Hash produces random looking hex, plus a ".json" extension
 func (j *JsonRecord[T]) Hash() string {
 	b, _ := j.MarshalBinary()
-	tab := crc64.MakeTable(6996)
-	h := crc64.Checksum(b, tab)
-	return fmt.Sprintf("%x.json", h)
+	hash := crc64.Checksum(b, crc64.MakeTable(6996396))
+	return fmt.Sprintf("%x.json", hash)
 }
+
+// MarshalBinary marshals to JSON
 func (j *JsonRecord[T]) MarshalBinary() ([]byte, error) {
 	return json.Marshal(j.Data)
 }
+
+// UnmarshalBinary unmarshals from JSON
 func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
 	var data T
 	err := json.Unmarshal(p, data)
@@ -35,10 +42,4 @@ func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
 	}
 	j.Data = data
 	return nil
-}
-func (j *JsonRecord[T]) Clone() EncodeHasher {
-	var j2 = new(JsonRecord[T])
-	jbytes, _ := j.MarshalBinary()
-	j2.UnmarshalBinary(jbytes)
-	return j2
 }

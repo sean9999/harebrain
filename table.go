@@ -26,63 +26,30 @@ func (t *Table) Insert(rec EncodeHasher) error {
 	return nil
 }
 
-func (t *Table) Load(f string, rec EncodeHasher) error {
+func (t *Table) Get(f string) ([]byte, error) {
 	fullPath := filepath.Join(t.Path(), f)
-	p, err := t.Db.Filesystem.ReadFile(fullPath)
-	if err != nil {
-		return err
-	}
-	return rec.UnmarshalBinary(p)
+	return t.Db.Filesystem.ReadFile(fullPath)
 }
 
-func (t *Table) LoadAll(rec EncodeHasher) map[string]EncodeHasher {
+func (t *Table) GetAll() (map[string][]byte, error) {
 	entries, err := t.Db.Filesystem.ReadDir(t.Path())
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	m := map[string]EncodeHasher{}
+	m := map[string][]byte{}
 	for _, entry := range entries {
 		if entry.Type().IsRegular() {
-			rc := rec.Clone()
-			err = t.Load(entry.Name(), rc)
-			m[entry.Name()] = rc
+			b, err := t.Db.Filesystem.ReadFile(filepath.Join(t.Path(), entry.Name()))
+			if err != nil {
+				return nil, err
+			}
+			m[entry.Name()] = b
 		}
 	}
-	return m
+	return m, nil
 }
 
 func (t *Table) Delete(f string) error {
 	fullPath := filepath.Join(t.Path(), f)
 	return t.Db.Filesystem.Remove(fullPath)
 }
-
-// func (t *Table) LoadRecords(obj EncodeHasher) []error {
-// 	records := map[string]EncodeHasher{}
-// 	errs := []error{}
-// 	entries, err := t.Db.Filesystem.ReadDir(t.Path())
-// 	if err != nil {
-// 		return nil, []error{err}
-// 	}
-// 	for _, entry := range entries {
-// 		if entry.Type().IsRegular() {
-// 			p, err := t.Db.Filesystem.ReadFile(filepath.Join(t.Path(), entry.Name()))
-// 			if err == nil {
-
-// 				err := rec.UnmarshalBinary(p)
-// 				if err != nil {
-// 					errs = append(errs, err)
-// 					continue
-// 				}
-// 				hash := rec.Hash()
-// 				if hash != entry.Name() {
-// 					errs = append(errs, fmt.Errorf("hash %q doesn't match filename %q", hash, entry.Name()))
-// 				} else {
-// 					records[hash] = rec
-// 				}
-// 			} else {
-// 				errs = append(errs, err)
-// 			}
-// 		}
-// 	}
-// 	return records, errs
-// }
