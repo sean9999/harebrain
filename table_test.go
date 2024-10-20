@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// *dog implements EncoderHasher
+// *dog implements EncodeHasher
 var _ EncodeHasher = (*dog)(nil)
 
 type dog struct {
