@@ -19,5 +19,5 @@ docs:
 	pkgsite -open .
 
 publish:
-	GOPROXY=https://goproxy.io,direct go list -m ${REPO}@${SEMVER}
+	GOPROXY=https://proxy.golang.org,https://goproxy.io,direct go list -m ${REPO}@${SEMVER}
 
