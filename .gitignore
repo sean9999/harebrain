@@ -1,3 +1,5 @@
 harebrain.code-workspace
 go.work
 go.work.*
+.vscode/
+.idea/
