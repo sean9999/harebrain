@@ -20,6 +20,7 @@ type cat struct {
 	Breed string
 }
 
+//  if you don't need a bespoke Hash() function, you can use [JsonRecord]
 type catRecord = harebrain.JsonRecord[cat]
 
 func main(){

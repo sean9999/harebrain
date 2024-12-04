@@ -9,7 +9,7 @@ import (
 
 // an EncodeHasher is a record in a table in a harebrain database
 type EncodeHasher interface {
-	Hash() string
+	Hash() string // unique
 	encoding.BinaryMarshaler
 	encoding.BinaryUnmarshaler
 }
@@ -21,7 +21,7 @@ type JsonRecord[T any] struct {
 	Data T
 }
 
-// Hash produces random looking hex, plus a ".json" extension
+// Hash produces random looking hex
 func (j *JsonRecord[T]) Hash() string {
 	b, _ := j.MarshalBinary()
 	hash := crc64.Checksum(b, crc64.MakeTable(6996396))

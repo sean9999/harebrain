@@ -8,6 +8,5 @@
 			"name": "RealFS",
 			"path": "../go-real-fs"
 		}
-	],
-	"settings": {}
+	]
 }

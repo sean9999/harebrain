@@ -30,8 +30,12 @@ type cat = JsonRecord[nakedCat]
 func (j *dog) Hash() string {
 	b, _ := j.MarshalBinary()
 	h := crc32.ChecksumIEEE(b)
-	return fmt.Sprintf("%x.json", h)
+	return fmt.Sprintf("%x", h)
 }
+func (j *dog) Key() string {
+	return j.Hash() + ".json"
+}
+
 func (j *dog) MarshalBinary() ([]byte, error) {
 	return json.Marshal(j)
 }
