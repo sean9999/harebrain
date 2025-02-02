@@ -7,7 +7,7 @@ import (
 	"hash/crc64"
 )
 
-// an EncodeHasher is a record in a table in a harebrain database
+// An EncodeHasher is a record in a table in a harebrain database
 type EncodeHasher interface {
 	Hash() string // unique
 	encoding.BinaryMarshaler
@@ -33,7 +33,7 @@ func (j *JsonRecord[T]) MarshalBinary() ([]byte, error) {
 	return json.Marshal(j.Data)
 }
 
-// UnmarshalBinary unmarshals from JSON
+// UnmarshalBinary un-marshals from JSON
 func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
 	var data T
 	err := json.Unmarshal(p, data)
