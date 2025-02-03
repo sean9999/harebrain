@@ -2,20 +2,20 @@ package harebrain
 
 import (
 	"fmt"
+	"github.com/spf13/afero"
 	"os"
-
-	realfs "github.com/sean9999/go-real-fs"
 )
 
-// a Database is a root folder that acts as a container for [Table]s
+// A Database is a root folder that acts as a container for [Table]s.
 type Database struct {
 	Folder     string
-	Filesystem realfs.WritableFs
+	Filesystem afero.IOFS
 }
 
 func NewDatabase() *Database {
+	realfs := afero.NewOsFs()
 	db := Database{
-		Filesystem: realfs.NewWritable(),
+		Filesystem: afero.NewIOFS(realfs),
 	}
 	return &db
 }

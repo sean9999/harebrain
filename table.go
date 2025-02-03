@@ -1,6 +1,7 @@
 package harebrain
 
 import (
+	"github.com/spf13/afero"
 	"path/filepath"
 )
 
@@ -16,7 +17,7 @@ func (t *Table) Path() string {
 func (t *Table) Insert(rec SERDEHasher) error {
 	b := rec.Serialize()
 	fullPath := filepath.Join(t.Path(), rec.Hash())
-	err := t.Db.Filesystem.WriteFile(fullPath, b, 0644)
+	err := afero.WriteFile(t.Db.Filesystem.Fs, fullPath, b, 0644)
 	if err != nil {
 		return err
 	}

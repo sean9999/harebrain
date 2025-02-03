@@ -31,7 +31,7 @@ type cat = JsonRecord[nakedCat]
 func (j *dog) Hash() string {
 	b := j.Serialize()
 	h := crc32.ChecksumIEEE(b)
-	return fmt.Sprintf("%x", h)
+	return fmt.Sprintf("%x.json", h)
 }
 func (j *dog) Key() string {
 	return j.Hash() + ".json"
@@ -74,8 +74,10 @@ func TestTable_Insert(t *testing.T) {
 		dog3 := &dog{3, "Charles", "ratcha!"}
 		err = db.Table("dogs").Insert(fido)
 		assert.Nil(t, err)
-		db.Table("dogs").Insert(dog2)
-		db.Table("dogs").Insert(dog3)
+		err = db.Table("dogs").Insert(dog2)
+		assert.Nil(t, err)
+		err = db.Table("dogs").Insert(dog3)
+		assert.Nil(t, err)
 	})
 
 	t.Run("insert some cats", func(t *testing.T) {

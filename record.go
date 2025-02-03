@@ -6,18 +6,18 @@ import (
 	"hash/crc64"
 )
 
-// a SERDE is a Serializer and Deserializer
+// A SERDE is a Serializer and Deserializer
 type SERDE interface {
 	Serialize() []byte
 	Deserialize([]byte)
 }
 
-// a Hasher can produce a unique deterministic string representation of itself
+// A Hasher can produce a unique deterministic string representation of itself
 type Hasher interface {
 	Hash() string
 }
 
-// an SERDEHasher is a record in a table in a harebrain database
+// A SERDEHasher is a record in a table in a harebrain database
 type SERDEHasher interface {
 	Hasher
 	SERDE

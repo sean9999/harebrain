@@ -1,7 +1,6 @@
 package harebrain
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -16,5 +15,6 @@ func (h *Herror) Error() string {
 var ErrHareBrain = &Herror{msg: "harebrained"}
 
 var ErrDatabase = fmt.Errorf("%w: database", ErrHareBrain)
-var ErrNoSuchRecord = errors.New("no such record")
-var ErrNoSuchTable = errors.New("no such table")
+
+//var ErrNoSuchRecord = errors.New("no such record")
+//var ErrNoSuchTable = errors.New("no such table")
