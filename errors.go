@@ -5,11 +5,20 @@ import (
 )
 
 type Herror struct {
-	msg string
+	msg   string
+	child error
 }
 
 func (h *Herror) Error() string {
 	return h.msg
+}
+
+func (h *Herror) Unwrap() error {
+	return h.child
+}
+
+func (h *Herror) Wrap(e error) {
+	h.child = e
 }
 
 var ErrHareBrain = &Herror{msg: "harebrained"}
