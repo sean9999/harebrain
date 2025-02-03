@@ -26,7 +26,6 @@ type catRecord = harebrain.JsonRecord[cat]
 func main(){
 
     myCat := &cat{1,"Muffin","Calico"}
-
     db := harebrain.NewDatabase()
     db.Open("data")
     db.Table("cats").Insert(myCat)

@@ -1,45 +1,60 @@
 package harebrain
 
 import (
-	"encoding"
 	"encoding/json"
 	"fmt"
 	"hash/crc64"
 )
 
-// an EncodeHasher is a record in a table in a harebrain database
-type EncodeHasher interface {
-	Hash() string // unique
-	encoding.BinaryMarshaler
-	encoding.BinaryUnmarshaler
+// a SERDE is a Serializer and Deserializer
+type SERDE interface {
+	Serialize() []byte
+	Deserialize([]byte)
 }
 
-var _ EncodeHasher = (*JsonRecord[string])(nil)
+// a Hasher can produce a unique deterministic string representation of itself
+type Hasher interface {
+	Hash() string
+}
+
+// an SERDEHasher is a record in a table in a harebrain database
+type SERDEHasher interface {
+	Hasher
+	SERDE
+}
+
+var _ SERDEHasher = (*JsonRecord[string])(nil)
 
 // JsonRecord is an EncodeHasher that serializes to JSON
 type JsonRecord[T any] struct {
 	Data T
 }
 
+func must[T any](a T, e error) T {
+	if e != nil {
+		panic(e)
+	}
+	return a
+}
+
 // Hash produces random looking hex
 func (j *JsonRecord[T]) Hash() string {
-	b, _ := j.MarshalBinary()
+	b := j.Serialize()
 	hash := crc64.Checksum(b, crc64.MakeTable(6996396))
 	return fmt.Sprintf("%x.json", hash)
 }
 
-// MarshalBinary marshals to JSON
-func (j *JsonRecord[T]) MarshalBinary() ([]byte, error) {
-	return json.Marshal(j.Data)
+// Serialize marshals to JSON, and panics on error
+func (j *JsonRecord[T]) Serialize() []byte {
+	return must(json.Marshal(j.Data))
 }
 
-// UnmarshalBinary unmarshals from JSON
-func (j *JsonRecord[T]) UnmarshalBinary(p []byte) error {
+// Deserialize unmarshals from JSON, and panics on error
+func (j *JsonRecord[T]) Deserialize(p []byte) {
 	var data T
 	err := json.Unmarshal(p, data)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	j.Data = data
-	return nil
 }

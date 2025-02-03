@@ -13,13 +13,10 @@ func (t *Table) Path() string {
 	return filepath.Join(t.Db.Folder, t.Folder)
 }
 
-func (t *Table) Insert(rec EncodeHasher) error {
-	b, err := rec.MarshalBinary()
-	if err != nil {
-		return err
-	}
+func (t *Table) Insert(rec SERDEHasher) error {
+	b := rec.Serialize()
 	fullPath := filepath.Join(t.Path(), rec.Hash())
-	err = t.Db.Filesystem.WriteFile(fullPath, b, 0644)
+	err := t.Db.Filesystem.WriteFile(fullPath, b, 0644)
 	if err != nil {
 		return err
 	}
