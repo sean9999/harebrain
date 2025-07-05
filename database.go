@@ -3,16 +3,31 @@ package harebrain
 import (
 	"fmt"
 	"github.com/spf13/afero"
+	"iter"
 	"os"
 )
 
-// A Database is a root folder that acts as a container for [Table]s.
-type Database struct {
-	Folder     string
-	Filesystem afero.IOFS
+type Store[K comparable, V SERDEHasher] interface {
+	Save(V) error
+	Get(K) (V, error)
+	Delete(K) error
+	All() iter.Seq2[K, V]
+	Purge() error
+	Join(...K) K
+	Namespace() K
+	Initialize(...any) error
+	Connect(...any) error
+	Child(K) Store[K, V]
+	Parent() Store[K, V]
 }
 
-func NewDatabase() *Database {
+// A Database is a root folder that acts as a container for [Table]s.
+type Database[K comparable, V SERDEHasher] struct {
+	namespace K
+	Store     Store[K, V]
+}
+
+func NewDatabase[K comparable, V SERDEHasher]() *Database[K, V] {
 	realfs := afero.NewOsFs()
 	db := Database{
 		Filesystem: afero.NewIOFS(realfs),

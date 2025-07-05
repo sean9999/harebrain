@@ -14,7 +14,7 @@ func (t *Table) Path() string {
 	return filepath.Join(t.Db.Folder, t.Folder)
 }
 
-func (t *Table) Insert(rec SERDEHasher) error {
+func (t *Table) Insert(rec SE	RDEHasher) error {
 	b := rec.Serialize()
 	fullPath := filepath.Join(t.Path(), rec.Hash())
 	err := afero.WriteFile(t.Db.Filesystem.Fs, fullPath, b, 0644)
